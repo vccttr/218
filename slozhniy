@@ -1,0 +1,31 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+
+# Загрузка данных
+df = pd.read_csv('data.csv')
+
+# Преобразование категориальных переменных в числовые
+for cat in df.columns:
+    if df[cat].dtype == 'O':
+        df[cat] = df[cat].astype('category').cat.codes
+
+# Разделение данных на обучающую и тестовую выборки
+X = df.drop(['target'], axis=1)
+y = df['target']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Создание и обучение модели
+model = RandomForestClassifier(n_estimators=100, max_depth=8, random_state=42)
+model.fit(X_train, y_train)
+
+# Прогнозирование на тестовых данных
+y_pred = model.predict(X_test)
+
+# Оценка производительности модели
+print('Confusion matrix:')
+print(confusion_matrix(y_test, y_pred))
+print('Classification report:')
+print(classification_report(y_test, y_pred))
